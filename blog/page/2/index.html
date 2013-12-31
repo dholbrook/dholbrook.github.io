@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Mostly Blather</title>
+  <meta name="author" content="David Holbrook">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://dholbrook.github.io/blog/page/2">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="Mostly Blather" type="application/atom+xml">
+
+  <link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+
+  <script src="/javascripts/libs/jquery/jquery-2.0.3.min.js"></script>
+  
+
+</head>
+
+  <body   >
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Mostly Blather</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="search navbar-form navbar-right" action="http://google.com/search" method="GET">
+                    <input type="hidden" name="q" value="site:dholbrook.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9">
+    <div class="blog-index">
+      
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-03-21T00:00:00-07:00" pubdate data-updated="true">Mar 21<span>st</span>, 2010</time>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2010/03/21/scala-external-dsl-and-combinator-parsing-experimentation/">Scala External DSL and Combinator Parsing Experimentation</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>Yesterday I was looking around on the inter-webs for a Scala project that was “<a href="http://ibatis.apache.org/">iBatis</a>” like, but more Scala oriented.&#160; I found some cool stuff (<a href="http://www.sts.tu-harburg.de/people/mi.garcia/ScalaQL/">ScalaQL</a>, and <a href="http://github.com/p3t0r/scala-sql-dsl">scala-sql-dsl</a> for example) but nothing quite what I was looking for.</p>  <p>I kind of chewed on what exactly it was that I was looking for and this is my 10k/foot feature list:</p>  <ul>   <li>Ability to define the underlying data store in a DSL that can be understood by Scala </li>    <li>Ability to map Scala classes to JDBC results by binding to artifacts of the data store </li> </ul>  <p>This is more or less what iBatis accomplishes with xml (now annotations) and a bunch of reflection.&#160; I’d like to see it done without XML and minimal reflection.</p>  <p>That sent me down the rabbit hole on how exactly one goes about defining a DSL in scala.&#160; I re-read chapter 31 in <a href="http://www.artima.com/shop/programming_in_scala">Programming in Scala</a>.&#160; I also read chapter 11 in <a href="http://programming-scala.labs.oreilly.com/ch11.html">Programming Scala</a>.&#160; Then I took a stab at writing a parser combinator for a very, very small subset of the “CREATE TABLE” DDL syntax for SQL.</p>  <pre class="brush: scala">import scala.util.parsing.combinator._<br /><br />class TableDdlParser extends JavaTokenParsers {<br />  <br />  def tables: Parser[Map[String, Any]] = rep(table) ^^ { Map() ++ _ }<br />  <br />  def table: Parser[(String,Any)] = <br />    (&quot;TABLE&quot; ~ tableName ~ columns <br />       ^^ { case &quot;TABLE&quot; ~ tableName ~ tableContents =&gt; (tableName,tableContents) })<br />  <br />  def tableName: Parser[String] = ident ^^ { case ident =&gt; ident }<br />  <br />  def columns: Parser[Map[String, Any]] = &quot;(&quot;~&gt; repsep(column, &quot;,&quot;) &lt;~&quot;)&quot; ^^ { Map() ++ _ }<br />  <br />  def column: Parser[(String,Any)] = <br />    columnName ~ dataType ^^ { case columnName ~ dataType =&gt; (columnName,dataType) }<br />    <br />  def columnName: Parser[String] = ident ^^ { case ident =&gt; ident }<br />  <br />  def dataType: Parser[Any] = &quot;VARCHAR&quot; | &quot;INTEGER&quot;<br />  <br />}<br /><br />object TableDdlParserRunner extends TableDdlParser {<br />  <br />  def main(args: Array[String]) {<br />    val input = <br />      &quot;&quot;&quot;TABLE person (first_name VARCHAR, last_name VARCHAR, age INTEGER)<br />         TABLE place (city VARCHAR, state VARCHAR)&quot;&quot;&quot;<br />    println(parseAll(tables,input))<br />  }<br /> <br />}</pre><br /><br /><p>Here is the output</p><br /><br /><pre class="brush: text">[2.51] parsed: <br />Map(person -&gt; Map(first_name -&gt; VARCHAR, <br />                  last_name -&gt; VARCHAR, <br />                  age -&gt; INTEGER), <br />    place -&gt; Map(city -&gt; VARCHAR, <br />                 state -&gt; VARCHAR))</pre><br /><br /><p>This experiment only supports two data types (VARCHAR and INTEGER), without any of the other metadata that is required for those types.&#160; I just wanted a feel for how hard it would be to write and didn’t want to get bogged down in the details.&#160; It turned out to be quite a bit easier than I thought it would be. </p><br /><br /><p>Next up is to figure out the best way to map this DDL information to a scala class (If I don’t get distracted by something else first).</p>
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-03-17T00:00:00-07:00" pubdate data-updated="true">Mar 17<span>th</span>, 2010</time>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2010/03/17/save-tortoisehg-remote-repository-credentials/">Save TortoiseHg Remote Repository Credentials</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>A quick tip so you don’t have to re-enter your user name and password every time you pull or push from a remote Mercurial repository when using TortoiseHg.</p>  <p>Right click in the folder explorer and select TortoiseHg –&gt; Repository Settings.</p>  <p><a href="http://lh4.ggpht.com/_73YtsrpL_Mo/S6GaT3FzgiI/AAAAAAAAAVc/9kNI0tsw5eU/s1600-h/repository_settings%5B7%5D.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="repository_settings" border="0" alt="repository_settings" src="http://lh4.ggpht.com/_73YtsrpL_Mo/S6GaUrawbNI/AAAAAAAAAVg/qSTIN2ERPpM/repository_settings_thumb%5B5%5D.png?imgmax=800" width="379" height="466" /></a></p>  <p>Select the “Sync” tab in the “TortoiseHg Configure Repository” window.&#160; Either select the desired Remote repository path and click “Edit” or create a new Remote repository path with the “Add” button.</p>  <p><a href="http://lh3.ggpht.com/_73YtsrpL_Mo/S6GaUypeH8I/AAAAAAAAAVk/W26RvueLLmk/s1600-h/sync%5B5%5D.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="sync" border="0" alt="sync" src="http://lh6.ggpht.com/_73YtsrpL_Mo/S6GaVTsfRTI/AAAAAAAAAVo/NwxP-jVXcu0/sync_thumb%5B3%5D.png?imgmax=800" width="393" height="379" /></a> </p>  <p>That will bring up the “Edit remote repository path” dialog.&#160; Enter your User and Password, then click OK.</p>  <p>&#160;</p>  <p><a href="http://lh6.ggpht.com/_73YtsrpL_Mo/S6GaV5sVg8I/AAAAAAAAAVs/qZ1NGDwB9sI/s1600-h/edit%5B5%5D.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="edit" border="0" alt="edit" src="http://lh5.ggpht.com/_73YtsrpL_Mo/S6GaWSxevcI/AAAAAAAAAVw/fGLT4T0lU_I/edit_thumb%5B3%5D.png?imgmax=800" width="374" height="232" /></a> </p>  <p>Finally click the “Apply” button on the “TortoiseHg Configure Repository” window.</p>
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-02-28T00:00:00-08:00" pubdate data-updated="true">Feb 28<span>th</span>, 2010</time>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2010/02/28/scala-with-resteasy-%28jax-rs%29/">Scala With RESTEasy (JAX-RS)</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>In the <a href="http://johnnycoder.com/blog/2010/01/06/how-to-organize-a-programming-language-club/">&quot;code club&quot; / &quot;dojo&quot;</a> or whatever you want to call it that Ben (aka <a href="http://johnnycoder.com/blog/">Johnny Coder</a>) organized we have been learning about Scala the last few weeks. I have been puttering with <a href="http://www.scala-lang.org/">Scala</a> on my own for about a year now, and it has been fun to engage with other folk in the learning process. We have mostly been doing a mix of <a href="http://projecteuler.net/">Project Euler</a> and the <a href="http://aperiodic.net/phil/scala/s-99/">S-99</a> problems as exercises. Those problems are fun, but they don&#8217;t really reflect the kind of day to day programming tasks that I am usually engaged in. </p>  <p>To scratch that slightly more practical itch, I decided to see how well Scala fits in with other tools in the Java ecosystem. The Java ecosystem being broad, and my Scala kung fu being not that strong, all I have are some possibly interesting bits I discovered while trying to get Scala and <a href="http://www.jboss.org/resteasy">RESTEasy</a> working together.&#160; I picked RESTEasy because in the middle of reading <a href="http://oreilly.com/catalog/9780596158040/">RESTful Java with JAX-RS</a>.</p>  <p>I started off with an <a href="https://resteasy.svn.sourceforge.net/svnroot/resteasy/tags/RESTEASY_JAXRS_1_2_GA/examples/oreilly-workbook/ex11_2/">existing</a> example project from chapter 11 in the RESTEasy book. I added the <a href="http://scala-tools.org/mvnsites/maven-scala-plugin/">Scala plugin</a> to the maven build, and I was off. </p>  <p>The first class I converted over was a JAXB annotated class <a href="https://resteasy.svn.sourceforge.net/svnroot/resteasy/tags/RESTEASY_JAXRS_1_2_GA/examples/oreilly-workbook/ex11_2/src/main/java/com/restfully/shop/domain/Customer.java">com.restfully.shop.domain.Customer</a></p>  <p>I ran into a few things that caused me problems.&#160; The first was this compiler message:</p>  <pre class="brush: text">&quot;';' expected but ',' found&quot;</pre><br /><br /><p>At the @XMLType annotation line.&#160; The resolution was to switch from using the Array literal &quot;{}&quot; Java syntax to the Scala Array object.</p><br /><br /><p>I also got a JAXB runtime error during the JUnit tests:</p><br /><br /><pre class="brush: text">....<br />Caused by: com.sun.xml.bind.v2.runtime.IllegalAnnotationsException: 15 counts of IllegalAnnotationExceptions<br />There are two properties named ....</pre><br /><br /><p>I resolved that by using the @XmlAccessorType(XmlAccessType.FIELD) annotation.</p><br /><br /><p>For compatibility with the existing code that expected Java Bean style property access, I added the @BeanProperty annotation.&#160;&#160; The annotation causes Scala to automatically generate get/set methods. </p><br /><br /><p>Here is the java version of Customer:</p><br /><br /><pre class="brush: java">package com.restfully.shop.domain;<br /><br />import javax.xml.bind.annotation.XmlAttribute;<br />import javax.xml.bind.annotation.XmlElement;<br />import javax.xml.bind.annotation.XmlRootElement;<br />import javax.xml.bind.annotation.XmlType;<br /><br />@XmlRootElement(name = &quot;customer&quot;)<br />@XmlType(propOrder = {&quot;firstName&quot;, &quot;lastName&quot;, &quot;street&quot;, &quot;city&quot;, &quot;state&quot;, &quot;zip&quot;, &quot;country&quot;})<br />public class Customer<br />{<br />   private int id;<br />   private String firstName;<br />   private String lastName;<br />   private String street;<br />   private String city;<br />   private String state;<br />   private String zip;<br />   private String country;<br /><br />   @XmlAttribute<br />   public int getId()<br />   {<br />      return id;<br />   }<br /><br />   public void setId(int id)<br />   {<br />      this.id = id;<br />   }<br /><br />   @XmlElement(name = &quot;first-name&quot;)<br />   public String getFirstName()<br />   {<br />      return firstName;<br />   }<br /><br />   public void setFirstName(String firstName)<br />   {<br />      this.firstName = firstName;<br />   }<br /><br />   @XmlElement(name = &quot;last-name&quot;)<br />   public String getLastName()<br />   {<br />      return lastName;<br />   }<br /><br />   public void setLastName(String lastName)<br />   {<br />      this.lastName = lastName;<br />   }<br /><br />   @XmlElement<br />   public String getStreet()<br />   {<br />      return street;<br />   }<br /><br />   public void setStreet(String street)<br />   {<br />      this.street = street;<br />   }<br /><br />   @XmlElement<br />   public String getCity()<br />   {<br />      return city;<br />   }<br /><br />   public void setCity(String city)<br />   {<br />      this.city = city;<br />   }<br /><br />   @XmlElement<br />   public String getState()<br />   {<br />      return state;<br />   }<br /><br />   public void setState(String state)<br />   {<br />      this.state = state;<br />   }<br /><br />   @XmlElement<br />   public String getZip()<br />   {<br />      return zip;<br />   }<br /><br />   public void setZip(String zip)<br />   {<br />      this.zip = zip;<br />   }<br /><br />   @XmlElement<br />   public String getCountry()<br />   {<br />      return country;<br />   }<br /><br />   public void setCountry(String country)<br />   {<br />      this.country = country;<br />   }<br /><br />   @Override<br />   public String toString()<br />   {<br />      return &quot;Customer{&quot; +<br />              &quot;id=&quot; + id +<br />              &quot;, firstName='&quot; + firstName + '\'' +<br />              &quot;, lastName='&quot; + lastName + '\'' +<br />              &quot;, street='&quot; + street + '\'' +<br />              &quot;, city='&quot; + city + '\'' +<br />              &quot;, state='&quot; + state + '\'' +<br />              &quot;, zip='&quot; + zip + '\'' +<br />              &quot;, country='&quot; + country + '\'' +<br />              '}';<br />   }<br />}</pre><br /><br /><p>Here is my Scala conversion of Customer:</p><br /><br /><pre class="brush: scala">package com.restfully.shop.domain<br /><br />import javax.xml.bind.annotation.XmlAttribute<br />import javax.xml.bind.annotation.XmlElement<br />import javax.xml.bind.annotation.XmlRootElement<br />import javax.xml.bind.annotation.XmlType<br />import javax.xml.bind.annotation.XmlAccessorType<br />import javax.xml.bind.annotation.XmlAccessType<br /><br />import scala.reflect.BeanProperty<br /><br />@XmlRootElement(name = &quot;customer&quot;)<br />@XmlType(propOrder = Array(&quot;firstName&quot;, &quot;lastName&quot;, &quot;street&quot;, &quot;city&quot;, &quot;state&quot;, &quot;zip&quot;, &quot;country&quot;))<br />@XmlAccessorType(XmlAccessType.FIELD)<br />class Customer {<br /><br />   @XmlAttribute<br />   @BeanProperty<br />   var id: Int = _<br />   <br />   @XmlElement(name = &quot;first-name&quot;)<br />   @BeanProperty<br />   var firstName: String = _<br />   <br />   @XmlElement(name = &quot;last-name&quot;)<br />   @BeanProperty<br />   var lastName: String = _<br />   <br />   @XmlElement<br />   @BeanProperty<br />   var street: String = _<br />   <br />   @XmlElement<br />   @BeanProperty<br />   var city: String = _<br />   <br />   @XmlElement<br />   @BeanProperty<br />   var state: String = _<br />   <br />   @XmlElement<br />   @BeanProperty<br />   var zip: String = _<br /><br />   @XmlElement<br />   @BeanProperty<br />   var country: String = _<br /><br />   override def toString = <br />    &quot;Customer{&quot; +<br />    &quot;id=&quot; + id +<br />    &quot;, firstName='&quot; + firstName + '\'' +<br />    &quot;, lastName='&quot; + lastName + '\'' +<br />    &quot;, street='&quot; + street + '\'' +<br />    &quot;, city='&quot; + city + '\'' +<br />    &quot;, state='&quot; + state + '\'' +<br />    &quot;, zip='&quot; + zip + '\'' +<br />    &quot;, country='&quot; + country + '\'' +<br />    '}'<br />   <br />}</pre><br /><br /><p>The next class I converted was <a href="https://resteasy.svn.sourceforge.net/svnroot/resteasy/tags/RESTEASY_JAXRS_1_2_GA/examples/oreilly-workbook/ex11_2/src/main/java/com/restfully/shop/domain/Customers.java">com.restfully.shop.domain.Customers</a></p><br /><br /><p>This conversion was very similar, but it was dealing with collections.&#160; I found that Scala 2.8 has a new object <a href="http://www.scala-lang.org/archives/downloads/distrib/files/nightly/docs/library/scala/collection/JavaConversions$.html">scala.collection.JavaConversions</a> that contains many implicit conversion for Java collections.&#160; </p><br /><br /><p>Here is the Java version of Customers:</p><br /><br /><pre class="brush: java">package com.restfully.shop.domain;<br /><br />import javax.xml.bind.annotation.XmlElementRef;<br />import javax.xml.bind.annotation.XmlRootElement;<br />import javax.xml.bind.annotation.XmlTransient;<br />import java.util.ArrayList;<br />import java.util.Collection;<br />import java.util.List;<br /><br />/**<br /> * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a><br /> * @version $Revision: 1 $<br /> */<br />@XmlRootElement(name = &quot;customers&quot;)<br />public class Customers<br />{<br />   protected Collection<customer> customers = new ArrayList<customer>();<br />   protected List<link /> links;<br /><br />   @XmlElementRef<br />   public Collection<customer> getCustomers()<br />   {<br />      return customers;<br />   }<br /><br />   public void setCustomers(Collection<customer> customers)<br />   {<br />      this.customers = customers;<br />   }<br /><br />   @XmlElementRef<br />   public List<link /> getLinks()<br />   {<br />      return links;<br />   }<br /><br />   public void setLinks(List<link /> links)<br />   {<br />      this.links = links;<br />   }<br /><br />   @XmlTransient<br />   public String getNext()<br />   {<br />      if (links == null) return null;<br />      for (Link link : links)<br />      {<br />         if (&quot;next&quot;.equals(link.getRelationship())) return link.getHref();<br />      }<br />      return null;<br />   }<br /><br />   @XmlTransient<br />   public String getPrevious()<br />   {<br />      if (links == null) return null;<br />      for (Link link : links)<br />      {<br />         if (&quot;previous&quot;.equals(link.getRelationship())) return link.getHref();<br />      }<br />      return null;<br />   }<br /><br />}</pre><br /><br /><p>Here is my Scala conversion of Customers:</p><br /><br /><pre class="brush: scala">package com.restfully.shop.domain<br /><br />import java.util.{ArrayList =&gt; JArrayList}<br />import java.util.{Collection =&gt; JCollection}<br />import java.util.{List =&gt; JList}<br /><br />import javax.xml.bind.annotation.XmlElementRef<br />import javax.xml.bind.annotation.XmlRootElement<br />import javax.xml.bind.annotation.XmlTransient<br />import javax.xml.bind.annotation.XmlAccessorType<br />import javax.xml.bind.annotation.XmlAccessType<br /><br />import scala.collection.Iterable<br />import scala.collection.JavaConversions._<br />import scala.collection.mutable.Buffer<br /><br />@XmlRootElement(name = &quot;customers&quot;)<br />@XmlAccessorType(XmlAccessType.PROPERTY)<br />class Customers {<br /><br />  var customers = Iterable[Customer]() <br />  var links: Buffer[Link] = Buffer()<br />  <br />  @XmlElementRef<br />  def getCustomers: JCollection[Customer] = customers<br />  def setCustomers(customers: JCollection[Customer]) = {<br />    this.customers = customers<br />  }<br /> <br />  @XmlElementRef<br />  def getLinks: JList[Link] = links<br />  def setLinks(links: JList[Link]) = {<br />    this.links = links<br />  }<br />  <br />  @XmlTransient<br />  def getNext(): String = findHref(&quot;next&quot;)<br /> <br />  @XmlTransient<br />  def getPrevious(): String = findHref(&quot;previous&quot;)<br />  <br />  private def findHref(rname: String): String = {<br />    val rel = links.filter(_.getRelationship == rname)<br />    rel match {<br />      case Buffer() =&gt; null<br />      case _        =&gt; rel.head.getHref<br />    }<br />  }<br />  <br />}</pre><br /><br /><p>That’s about as far as I got this weekend.&#160; I guess I was actually mostly working with JAXB this time.&#160; The same example code has JPA as was as JAX-RS, and I’m going to try and convert the entire project to Scala, and if I do, I’ll upload it to BitBucket.</p>  
+</div>
+  
+  
+
+
+        </article>
+      
+    </div>
+
+    <ul class="pager">
+      
+        <li class="previous"><a href="/blog/page/3/">&larr;&nbsp;Older</a></li>
+      
+      <li><a href="/blog/archives">Blog Archives</a></li>
+      
+        <li class="next"><a href="/">Newer&nbsp;&rarr;</a></li>
+      
+    </ul>
+  </div>
+
+  
+    <aside class="sidebar col-md-3">
+      
+        <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2013/12/31/blog-moving-to-github/">Blog Moving to Github</a>
+    
+    <a class="list-group-item " href="/blog/2010/05/02/grails-and-dbunit-integration-testing/">Grails and DBUnit Integration Testing</a>
+    
+    <a class="list-group-item " href="/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/">Scala With Querulous vs. Java With Spring JdbcTemplate</a>
+    
+  </div>
+</section>
+
+
+
+
+
+
+      
+    </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2013 - David Holbrook<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    <script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr-2.0.js"></script>
+
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+  </body>
+</html>

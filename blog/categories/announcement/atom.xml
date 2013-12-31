@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: announcement | Mostly Blather]]></title>
+  <link href="http://dholbrook.github.io/blog/categories/announcement/atom.xml" rel="self"/>
+  <link href="http://dholbrook.github.io/"/>
+  <updated>2013-12-31T14:55:32-08:00</updated>
+  <id>http://dholbrook.github.io/</id>
+  <author>
+    <name><![CDATA[David Holbrook]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Blog Moving To Github]]></title>
+    <link href="http://dholbrook.github.io/blog/2013/12/31/blog-moving-to-github/"/>
+    <updated>2013-12-31T14:04:31-08:00</updated>
+    <id>http://dholbrook.github.io/blog/2013/12/31/blog-moving-to-github</id>
+    <content type="html"><![CDATA[<p>Mostly Blather is moving from <a href="http://www.blogger.com/">Bloger</a> to  <a href="http://pages.github.com/">Github Pages</a>.</p>
+
+<p>I am using <a href="http://octopress.org/">Octopress</a> with the <a href="http://kaworu.github.io/octopress/">Octostrap3</a> theme.  I imported the old blogger site with <a href="http://import.jekyllrb.com/">jekyll-import</a>.</p>
+
+<p>Some of the formatting of the old site has been lost, and there seems to be no good way of bringing the comments over.  Expect my next post to be about how it all worked out.</p>
+]]></content>
+  </entry>
+  
+</feed>

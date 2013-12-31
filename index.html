@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Mostly Blather</title>
+  <meta name="author" content="David Holbrook">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://dholbrook.github.io">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="Mostly Blather" type="application/atom+xml">
+
+  <link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+
+  <script src="/javascripts/libs/jquery/jquery-2.0.3.min.js"></script>
+  
+
+</head>
+
+  <body   >
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Mostly Blather</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="search navbar-form navbar-right" action="http://google.com/search" method="GET">
+                    <input type="hidden" name="q" value="site:dholbrook.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9">
+    <div class="blog-index">
+      
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2013-12-31T14:04:31-08:00" pubdate data-updated="true">Dec 31<span>st</span>, 2013</time>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2013/12/31/blog-moving-to-github/">Blog Moving to Github</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>Mostly Blather is moving from <a href="http://www.blogger.com/">Bloger</a> to  <a href="http://pages.github.com/">Github Pages</a>.</p>
+
+<p>I am using <a href="http://octopress.org/">Octopress</a> with the <a href="http://kaworu.github.io/octopress/">Octostrap3</a> theme.  I imported the old blogger site with <a href="http://import.jekyllrb.com/">jekyll-import</a>.</p>
+
+<p>Some of the formatting of the old site has been lost, and there seems to be no good way of bringing the comments over.  Expect my next post to be about how it all worked out.</p>
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-05-02T00:00:00-07:00" pubdate data-updated="true">May 2<span>nd</span>, 2010</time>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2010/05/02/grails-and-dbunit-integration-testing/">Grails and DBUnit Integration Testing</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>I need to do a bit of integration testing with Grails and both of the <a href="http://www.dbunit.org/">DBUnit</a> plugins I found didn’t seem to be maintained.&#160; To create a simple base class for DBUnit based integration tests turned out to be relatively simple to create.</p>  <p>For the purposes of this sample I created a grails project called bookstore with a single domain class called Book in the bookstore package.&#160; This is what book domain class looks like:</p>  <pre class="brush: groovy">package bookstore<br /><br />class Book {<br />    String title<br />    String author<br />}</pre><br /><br /><p>First I had to add the DBUnit dependency to /grails-app/conf/BuildConfig.groovy and also enable the maven central repository.&#160; This is what the grails.project.dependency.resolution section now looks like:</p><br /><br /><pre class="brush: groovy">grails.project.dependency.resolution = {<br />    inherits( &quot;global&quot; ) {<br />    }<br />    log &quot;warn&quot;<br />    repositories {        <br />        grailsPlugins()<br />        grailsHome()<br />        mavenCentral()<br />    }<br />    dependencies {<br />     test 'org.dbunit:dbunit:2.4.7'<br />    }<br />}</pre><br /><br /><p>Next I created a base class for my DBUnit based tests.&#160; I created a class named DbunitGroovyTestCase in /test/integration/bookstore.&#160; The DataSource property named dataSource is injected from the Spring container when the integration tests are run, and I used the DatabaseDataSourceConnection class to create the DBUnit connection.</p><br /><br /><pre class="brush: groovy">package bookstore<br /><br />import javax.sql.DataSource;<br /><br />import org.dbunit.database.DatabaseDataSourceConnection;<br />import org.dbunit.database.IDatabaseConnection;<br />import org.dbunit.dataset.xml.FlatXmlDataSetBuilder<br />import org.dbunit.dataset.xml.FlatXmlDataSet<br />import org.dbunit.dataset.IDataSet<br />import org.dbunit.operation.DatabaseOperation;<br /><br />import groovy.util.GroovyTestCase;<br /><br />class DbunitGroovyTestCase extends GroovyTestCase {<br /><br />    DataSource dataSource<br />    IDatabaseConnection connection<br /><br />    protected void setUp() {<br />        connection = new DatabaseDataSourceConnection(dataSource)<br />        DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet)<br />    }<br /><br />    protected void tearDown(){<br />        connection.close()<br />    }<br /><br />    protected IDataSet getDataSet() {<br />        return new FlatXmlDataSetBuilder().build(new FileInputStream(&quot;test/dbunit/dataset.xml&quot;));<br />    }<br /><br />}</pre><br /><br /><p>Here is a sample data set I created for the book table, located in test/dbunit/dataset.xml:</p><br /><br /><pre class="brush: xml">&lt;dataset&gt;<br />    &lt;book id=&quot;1&quot; version=&quot;1&quot; author=&quot;Mark Twain&quot; title=&quot;The Adventures of Tom Sawyer&quot;/&gt;<br />    &lt;book id=&quot;2&quot; version=&quot;1&quot; author=&quot;Mark Twain&quot; title=&quot;The Prince and the Pauper&quot;/&gt;<br />    &lt;book id=&quot;3&quot; version=&quot;1&quot; author=&quot;Mark Twain&quot; title=&quot;Adventures of Huckleberry Finn&quot;/&gt;<br />    &lt;book id=&quot;4&quot; version=&quot;1&quot; author=&quot;Mark Twain&quot; title=&quot;A Connecticut Yankee in King Arthur's Court&quot;/&gt;<br />&lt;/dataset&gt;</pre><br /><br /><p>Finally here is a sample integration test, located in test/integration/bookstore/BookPersistenceTest.groovy</p><br /><br /><pre class="brush: groovy">package bookstore;<br /><br />import grails.test.*<br /><br />class BookPersistenceTest extends DbunitGroovyTestCase  {<br /><br />    public void testFindAllByAuthor() throws Exception {<br />        def books = Book.findAllByAuthor(&quot;Mark Twain&quot;)<br />        assertEquals(4,books.size)<br />    }<br /><br />    public void testFindByTitle() throws Exception {<br />        def book = Book.findByTitle(&quot;Adventures of Huckleberry Finn&quot;)<br />        assertEquals(&quot;Mark Twain&quot;,book.author)<br />    }<br /><br />}</pre>
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-04-04T00:00:00-07:00" pubdate data-updated="true">Apr 4<span>th</span>, 2010</time>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/">Scala With Querulous vs. Java With Spring JdbcTemplate</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>While (<a href="http://www.mostlyblather.com/2010/03/scala-external-dsl-and-combinator.html">still</a>) looking around for a Scala SQL equivalent of iBatis, I found <a href="http://stackoverflow.com/questions/1362748/wanted-good-examples-of-scala-database-persistence">this post</a> on stackoverflow.&#160; Daniel’s answer let me to <a href="http://github.com/nkallen/querulous#readme">Querulous</a>.&#160; Several years ago I used the Spring Framework JdbcTemplate and it worked fine, but it was kind of clunky.&#160; That experience with JdbcTemplate led directly to using iBatis on that very same project.&#160; I have been mostly working with Hibernate/JPA since then, but for a certain class of problems, a SQL centric solution seems a better fit that a full blown ORM.</p>  <p>After looking at Querulous, and seeing how it manages to de-clutter the anonymous inner class clunkyness that is JdbcTemplate I’m left wondering if this isn’t the way I should go.</p>  <p>Here is a quick example from the <a href="http://static.springsource.org/spring/docs/2.5.x/reference/jdbc.html#jdbc-JdbcTemplate">JdbcTemplate</a> documentation in Java:</p>  <pre class="brush: java">Collection actors = this.jdbcTemplate.query(<br />    &quot;select first_name, surname from t_actor&quot;,<br />    new RowMapper() {<br /><br />        public Object mapRow(ResultSet rs, int rowNum) throws SQLException {<br />            Actor actor = new Actor();<br />            actor.setFirstName(rs.getString(&quot;first_name&quot;));<br />            actor.setSurname(rs.getString(&quot;surname&quot;));<br />            return actor;<br />        }<br />    });</pre><br /><br /><p>Here is the equivalent with Querulous in Scala:</p><br /><br /><pre class="brush: scala">  val actors = queryEvaluator.select(&quot;select first_name, surname from t_actor&quot;) { row =&gt;<br />    new Actor(row.getString(&quot;first_name&quot;), row.getString(&quot;surname&quot;))<br />  }</pre><br /><br /><p>Simple and easy to understand.&#160; Can’t beat that.</p>
+</div>
+  
+  
+
+
+        </article>
+      
+    </div>
+
+    <ul class="pager">
+      
+        <li class="previous"><a href="/blog/page/2/">&larr;&nbsp;Older</a></li>
+      
+      <li><a href="/blog/archives">Blog Archives</a></li>
+      
+        <li class="next disabled"><a href="#">Newer&nbsp;&rarr;</a></li>
+      
+    </ul>
+  </div>
+
+  
+    <aside class="sidebar col-md-3">
+      
+        <section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item " href="/blog/2013/12/31/blog-moving-to-github/">Blog Moving to Github</a>
+    
+    <a class="list-group-item " href="/blog/2010/05/02/grails-and-dbunit-integration-testing/">Grails and DBUnit Integration Testing</a>
+    
+    <a class="list-group-item " href="/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/">Scala With Querulous vs. Java With Spring JdbcTemplate</a>
+    
+  </div>
+</section>
+
+
+
+
+
+
+      
+    </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2013 - David Holbrook<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    <script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr-2.0.js"></script>
+
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+  </body>
+</html>
