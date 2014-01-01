@@ -12,3 +12,5 @@ Mostly Blather is moving from [Bloger](http://www.blogger.com/) to  [Github Page
 I am using [Octopress](http://octopress.org/) with the [Octostrap3](http://kaworu.github.io/octopress/) theme.  I imported the old blogger site with [jekyll-import](http://import.jekyllrb.com/).
 
 Some of the formatting of the old site has been lost, and there seems to be no good way of bringing the comments over.  Expect my next post to be about how it all worked out.
+
+Note: The old site is still available [here](http://mostlyblather.blogspot.com).
