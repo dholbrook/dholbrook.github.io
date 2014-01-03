@@ -4,7 +4,7 @@
   <title><![CDATA[Mostly Blather]]></title>
   <link href="http://mostlyblather.com/atom.xml" rel="self"/>
   <link href="http://mostlyblather.com/"/>
-  <updated>2014-01-03T12:18:35-08:00</updated>
+  <updated>2014-01-03T14:34:14-08:00</updated>
   <id>http://mostlyblather.com/</id>
   <author>
     <name><![CDATA[David Holbrook]]></name>
@@ -12,6 +12,191 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Scala Password Hash]]></title>
+    <link href="http://mostlyblather.com/blog/2014/01/03/scala-password-hash/"/>
+    <updated>2014-01-03T13:39:19-08:00</updated>
+    <id>http://mostlyblather.com/blog/2014/01/03/scala-password-hash</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m working on a spray framework REST based tech demo project, and I want to securely store passwords as salted hashes in a database.  I took a look around at existing projects, and couldn&rsquo;t find quite what I was looking for.</p>
+
+<ul>
+<li>simple to use and understand</li>
+<li>based on JVM built in crypto libraries</li>
+<li>written in Scala</li>
+</ul>
+
+
+<p>The closest thing I found was this: <a href="https://crackstation.net/hashing-security.htm#javasourcecode">Java PBKDF2 Password Hashing Code</a></p>
+
+<p>But it is written in Java&hellip;. So I took a crack at porting it to Scala.</p>
+
+<p>It lives here on github:</p>
+
+<p><a href="https://github.com/dholbrook/scala-password-hash">https://github.com/dholbrook/scala-password-hash</a></p>
+
+<p>The public methods <code>createHash()</code> and <code>validatePassword()</code> are for the most part the same as the Java version.  Some of the private methods are quite a bit different.</p>
+
+<h3>slowEquals</h3>
+
+<p>This is an interesting method in the Java implementation.  It is designed to always take the same amount of time to determine equality regardless of the length of the arrays being compared. Additionally it uses the XOR operator <code>^</code> to produce consistent branching.  I suspect using XOR in Java this way is somewhat controversial, regardless I used a similar approach in my Scala implementation.</p>
+
+<figure class='code'><figcaption><span>Java: slowEquals()</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">slowEquals</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">a</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">b</span><span class="o">)</span>
+</span><span class='line'><span class="o">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">diff</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="na">length</span> <span class="o">^</span> <span class="n">b</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">a</span><span class="o">.</span><span class="na">length</span> <span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">b</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+</span><span class='line'>        <span class="n">diff</span> <span class="o">|=</span> <span class="n">a</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">^</span> <span class="n">b</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">diff</span> <span class="o">==</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The most significant change in the Scala port is making <code>diff</code> immutable.  The same result is achieved by folding over a range, and using an accumulator seeded by the initial test of <code>a.length ^ b.length</code>.</p>
+
+<figure class='code'><figcaption><span>Scala: slowEquals()</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">private</span> <span class="k">def</span> <span class="n">slowEquals</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">],</span> <span class="n">b</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">range</span> <span class="k">=</span> <span class="mi">0</span> <span class="n">until</span> <span class="n">scala</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">min</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">length</span><span class="o">,</span> <span class="n">b</span><span class="o">.</span><span class="n">length</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">diff</span> <span class="k">=</span> <span class="n">range</span><span class="o">.</span><span class="n">foldLeft</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">length</span> <span class="o">^</span> <span class="n">b</span><span class="o">.</span><span class="n">length</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="o">(</span><span class="n">acc</span><span class="o">,</span> <span class="n">i</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">acc</span> <span class="o">|</span> <span class="n">a</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">^</span> <span class="n">b</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="n">diff</span> <span class="o">==</span> <span class="mi">0</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>fromHex / toHex</h3>
+
+<p>The utility functions <code>fromHex</code> and <code>toHex</code> saw a big size reduction.</p>
+
+<figure class='code'><figcaption><span>Java: fromHex() and toHex()</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">byte</span><span class="o">[]</span> <span class="nf">fromHex</span><span class="o">(</span><span class="n">String</span> <span class="n">hex</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">{</span>
+</span><span class='line'>        <span class="kt">byte</span><span class="o">[]</span> <span class="n">binary</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="n">hex</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">/</span> <span class="mi">2</span><span class="o">];</span>
+</span><span class='line'>        <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">binary</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+</span><span class='line'>        <span class="o">{</span>
+</span><span class='line'>            <span class="n">binary</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="o">(</span><span class="kt">byte</span><span class="o">)</span><span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">hex</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="o">),</span> <span class="mi">16</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">binary</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">toHex</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">array</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">{</span>
+</span><span class='line'>        <span class="n">BigInteger</span> <span class="n">bi</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigInteger</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">array</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">String</span> <span class="n">hex</span> <span class="o">=</span> <span class="n">bi</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="mi">16</span><span class="o">);</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">paddingLength</span> <span class="o">=</span> <span class="o">(</span><span class="n">array</span><span class="o">.</span><span class="na">length</span> <span class="o">*</span> <span class="mi">2</span><span class="o">)</span> <span class="o">-</span> <span class="n">hex</span><span class="o">.</span><span class="na">length</span><span class="o">();</span>
+</span><span class='line'>        <span class="k">if</span><span class="o">(</span><span class="n">paddingLength</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;%0&quot;</span> <span class="o">+</span> <span class="n">paddingLength</span> <span class="o">+</span> <span class="s">&quot;d&quot;</span><span class="o">,</span> <span class="mi">0</span><span class="o">)</span> <span class="o">+</span> <span class="n">hex</span><span class="o">;</span>
+</span><span class='line'>        <span class="k">else</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">hex</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Scala: fromHex() and toHex()</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>    <span class="k">private</span> <span class="k">def</span> <span class="n">fromHex</span><span class="o">(</span><span class="n">hex</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>      <span class="n">hex</span><span class="o">.</span><span class="n">sliding</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="mi">2</span><span class="o">).</span><span class="n">toArray</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="nc">Integer</span><span class="o">.</span><span class="n">parseInt</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="mi">16</span><span class="o">).</span><span class="n">toByte</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">private</span> <span class="k">def</span> <span class="n">toHex</span><span class="o">(</span><span class="n">bytes</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">])</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span>
+</span><span class='line'>      <span class="n">bytes</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="s">&quot;%02X&quot;</span> <span class="n">format</span> <span class="k">_</span><span class="o">).</span><span class="n">mkString</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Testing</h3>
+
+<p>I tested the code by using it in conjunction with the existing Java implementation.  Verifying that passwords created by each side were interoperable with the other.  I used <a href="http://www.scalacheck.org/">ScalaCheck</a> to randomly generate a set of passwords to test.</p>
+
+<figure class='code'><figcaption><span>PasswordHashTest</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">package</span> <span class="nn">scalapasswordhash</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">import</span> <span class="nn">org.scalacheck.Gen</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">org.scalacheck.Gen._</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">org.scalatest.FunSuite</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">org.scalatest.prop.GeneratorDrivenPropertyChecks</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">passwordhash.</span><span class="o">{</span><span class="nc">PasswordHash</span> <span class="k">=&gt;</span> <span class="nc">JPasswordHash</span><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">PasswordHashTest</span> <span class="k">extends</span> <span class="nc">FunSuite</span> <span class="k">with</span> <span class="nc">GeneratorDrivenPropertyChecks</span>  <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">test</span><span class="o">(</span><span class="s">&quot;hash generated from Java should validate with Scala&quot;</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">forAll</span> <span class="o">(</span><span class="n">identifier</span><span class="o">)</span> <span class="o">{</span> <span class="o">(</span><span class="n">password</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=&gt;</span>
+</span><span class='line'>      <span class="k">val</span> <span class="n">h1</span> <span class="k">=</span> <span class="nc">JPasswordHash</span><span class="o">.</span><span class="n">createHash</span><span class="o">(</span><span class="n">password</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">assert</span><span class="o">(</span><span class="nc">PasswordHash</span><span class="o">.</span><span class="n">validatePassword</span><span class="o">(</span><span class="n">password</span><span class="o">,</span> <span class="n">h1</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">test</span><span class="o">(</span><span class="s">&quot;hash generated from Scala should validate with Java&quot;</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">forAll</span> <span class="o">(</span><span class="n">identifier</span><span class="o">)</span> <span class="o">{</span> <span class="o">(</span><span class="n">password</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=&gt;</span>
+</span><span class='line'>      <span class="k">val</span> <span class="n">h1</span> <span class="k">=</span> <span class="nc">PasswordHash</span><span class="o">.</span><span class="n">createHash</span><span class="o">(</span><span class="n">password</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">assert</span><span class="o">(</span><span class="nc">JPasswordHash</span><span class="o">.</span><span class="n">validatePassword</span><span class="o">(</span><span class="n">password</span><span class="o">,</span> <span class="n">h1</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Blog Migration Recap]]></title>

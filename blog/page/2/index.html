@@ -114,6 +114,46 @@
 
 
 
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-05-02T00:00:00-07:00" pubdate data-updated="true">May 2<span>nd</span>, 2010</time>
+        
+           | <a href="/blog/2010/05/02/grails-and-dbunit-integration-testing/#disqus_thread"
+             data-disqus-identifier="http://mostlyblather.com/blog/2010/05/02/grails-and-dbunit-integration-testing/">Comments</a>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2010/05/02/grails-and-dbunit-integration-testing/">Grails and DBUnit Integration Testing</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>I need to do a bit of integration testing with Grails and both of the <a href="http://www.dbunit.org/">DBUnit</a> plugins I found didn’t seem to be maintained.&#160; To create a simple base class for DBUnit based integration tests turned out to be relatively simple to create.</p>  <p>For the purposes of this sample I created a grails project called bookstore with a single domain class called Book in the bookstore package.&#160; This is what book domain class looks like:</p>  <pre class="brush: groovy">package bookstore<br /><br />class Book {<br />    String title<br />    String author<br />}</pre><br /><br /><p>First I had to add the DBUnit dependency to /grails-app/conf/BuildConfig.groovy and also enable the maven central repository.&#160; This is what the grails.project.dependency.resolution section now looks like:</p><br /><br /><pre class="brush: groovy">grails.project.dependency.resolution = {<br />    inherits( &quot;global&quot; ) {<br />    }<br />    log &quot;warn&quot;<br />    repositories {        <br />        grailsPlugins()<br />        grailsHome()<br />        mavenCentral()<br />    }<br />    dependencies {<br />     test 'org.dbunit:dbunit:2.4.7'<br />    }<br />}</pre><br /><br /><p>Next I created a base class for my DBUnit based tests.&#160; I created a class named DbunitGroovyTestCase in /test/integration/bookstore.&#160; The DataSource property named dataSource is injected from the Spring container when the integration tests are run, and I used the DatabaseDataSourceConnection class to create the DBUnit connection.</p><br /><br /><pre class="brush: groovy">package bookstore<br /><br />import javax.sql.DataSource;<br /><br />import org.dbunit.database.DatabaseDataSourceConnection;<br />import org.dbunit.database.IDatabaseConnection;<br />import org.dbunit.dataset.xml.FlatXmlDataSetBuilder<br />import org.dbunit.dataset.xml.FlatXmlDataSet<br />import org.dbunit.dataset.IDataSet<br />import org.dbunit.operation.DatabaseOperation;<br /><br />import groovy.util.GroovyTestCase;<br /><br />class DbunitGroovyTestCase extends GroovyTestCase {<br /><br />    DataSource dataSource<br />    IDatabaseConnection connection<br /><br />    protected void setUp() {<br />        connection = new DatabaseDataSourceConnection(dataSource)<br />        DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet)<br />    }<br /><br />    protected void tearDown(){<br />        connection.close()<br />    }<br /><br />    protected IDataSet getDataSet() {<br />        return new FlatXmlDataSetBuilder().build(new FileInputStream(&quot;test/dbunit/dataset.xml&quot;));<br />    }<br /><br />}</pre><br /><br /><p>Here is a sample data set I created for the book table, located in test/dbunit/dataset.xml:</p><br /><br /><pre class="brush: xml">&lt;dataset&gt;<br />    &lt;book id=&quot;1&quot; version=&quot;1&quot; author=&quot;Mark Twain&quot; title=&quot;The Adventures of Tom Sawyer&quot;/&gt;<br />    &lt;book id=&quot;2&quot; version=&quot;1&quot; author=&quot;Mark Twain&quot; title=&quot;The Prince and the Pauper&quot;/&gt;<br />    &lt;book id=&quot;3&quot; version=&quot;1&quot; author=&quot;Mark Twain&quot; title=&quot;Adventures of Huckleberry Finn&quot;/&gt;<br />    &lt;book id=&quot;4&quot; version=&quot;1&quot; author=&quot;Mark Twain&quot; title=&quot;A Connecticut Yankee in King Arthur's Court&quot;/&gt;<br />&lt;/dataset&gt;</pre><br /><br /><p>Finally here is a sample integration test, located in test/integration/bookstore/BookPersistenceTest.groovy</p><br /><br /><pre class="brush: groovy">package bookstore;<br /><br />import grails.test.*<br /><br />class BookPersistenceTest extends DbunitGroovyTestCase  {<br /><br />    public void testFindAllByAuthor() throws Exception {<br />        def books = Book.findAllByAuthor(&quot;Mark Twain&quot;)<br />        assertEquals(4,books.size)<br />    }<br /><br />    public void testFindByTitle() throws Exception {<br />        def book = Book.findByTitle(&quot;Adventures of Huckleberry Finn&quot;)<br />        assertEquals(&quot;Mark Twain&quot;,book.author)<br />    }<br /><br />}</pre>
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
 <span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-04-04T00:00:00-07:00" pubdate data-updated="true">Apr 4<span>th</span>, 2010</time>
         
            | <a href="/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/#disqus_thread"
@@ -175,46 +215,6 @@
 
         </article>
       
-      
-        <article class="post">
-          
-  <header class="page-header">
-    
-      <p class="meta text-muted text-uppercase">
-        
-
-
-
-
-
-
-
-
-
-
-
-
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-03-17T00:00:00-07:00" pubdate data-updated="true">Mar 17<span>th</span>, 2010</time>
-        
-           | <a href="/blog/2010/03/17/save-tortoisehg-remote-repository-credentials/#disqus_thread"
-             data-disqus-identifier="http://mostlyblather.com/blog/2010/03/17/save-tortoisehg-remote-repository-credentials/">Comments</a>
-        
-      </p>
-    
-    
-      <h1 class="entry-title"><a href="/blog/2010/03/17/save-tortoisehg-remote-repository-credentials/">Save TortoiseHg Remote Repository Credentials</a></h1>
-    
-  </header>
-
-
-  <div class="entry-content clearfix"><p>A quick tip so you don’t have to re-enter your user name and password every time you pull or push from a remote Mercurial repository when using TortoiseHg.</p>  <p>Right click in the folder explorer and select TortoiseHg –&gt; Repository Settings.</p>  <p><a href="http://lh4.ggpht.com/_73YtsrpL_Mo/S6GaT3FzgiI/AAAAAAAAAVc/9kNI0tsw5eU/s1600-h/repository_settings%5B7%5D.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="repository_settings" border="0" alt="repository_settings" src="http://lh4.ggpht.com/_73YtsrpL_Mo/S6GaUrawbNI/AAAAAAAAAVg/qSTIN2ERPpM/repository_settings_thumb%5B5%5D.png?imgmax=800" width="379" height="466" /></a></p>  <p>Select the “Sync” tab in the “TortoiseHg Configure Repository” window.&#160; Either select the desired Remote repository path and click “Edit” or create a new Remote repository path with the “Add” button.</p>  <p><a href="http://lh3.ggpht.com/_73YtsrpL_Mo/S6GaUypeH8I/AAAAAAAAAVk/W26RvueLLmk/s1600-h/sync%5B5%5D.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="sync" border="0" alt="sync" src="http://lh6.ggpht.com/_73YtsrpL_Mo/S6GaVTsfRTI/AAAAAAAAAVo/NwxP-jVXcu0/sync_thumb%5B3%5D.png?imgmax=800" width="393" height="379" /></a> </p>  <p>That will bring up the “Edit remote repository path” dialog.&#160; Enter your User and Password, then click OK.</p>  <p>&#160;</p>  <p><a href="http://lh6.ggpht.com/_73YtsrpL_Mo/S6GaV5sVg8I/AAAAAAAAAVs/qZ1NGDwB9sI/s1600-h/edit%5B5%5D.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="edit" border="0" alt="edit" src="http://lh5.ggpht.com/_73YtsrpL_Mo/S6GaWSxevcI/AAAAAAAAAVw/fGLT4T0lU_I/edit_thumb%5B3%5D.png?imgmax=800" width="374" height="232" /></a> </p>  <p>Finally click the “Apply” button on the “TortoiseHg Configure Repository” window.</p>
-</div>
-  
-  
-
-
-        </article>
-      
     </div>
 
     <ul class="pager">
@@ -238,11 +238,11 @@
   
   <div id="recent_posts" class="list-group">
     
+    <a class="list-group-item " href="/blog/2014/01/03/scala-password-hash/">Scala Password Hash</a>
+    
     <a class="list-group-item " href="/blog/2014/01/03/blog-migration-recap/">Blog Migration Recap</a>
     
     <a class="list-group-item " href="/blog/2013/12/31/blog-moving-to-github/">Blog Moving to Github</a>
-    
-    <a class="list-group-item " href="/blog/2010/05/02/grails-and-dbunit-integration-testing/">Grails and DBUnit Integration Testing</a>
     
   </div>
 </section>
