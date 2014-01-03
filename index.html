@@ -114,6 +114,57 @@
 
 
 
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-01-03T12:05:22-08:00" pubdate data-updated="true">Jan 3<span>rd</span>, 2014</time>
+        
+           | <a href="/blog/2014/01/03/blog-migration-recap/#disqus_thread"
+             data-disqus-identifier="http://mostlyblather.com/blog/2014/01/03/blog-migration-recap/">Comments</a>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2014/01/03/blog-migration-recap/">Blog Migration Recap</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>The conversion from Blogger to <a href="http://octopress.org/">Octopress</a>/<a href="http://jekyllrb.com/">Jekyll</a> went a lot smoother than I expected it to.  The DNS now seems to be working correctly, I&rsquo;ve updated Google Analytics to use the new site, and I added some redirect pages that match the old site so searches can still find the old content.</p>
+
+<p>I still have a few things I want to do.</p>
+
+<ul>
+<li>Change the default Octopress favicon.</li>
+<li>Add a top categories sidebar</li>
+<li>Categorize old articles</li>
+</ul>
+
+
+<p>As an aside, I&rsquo;m really enjoying using Markdown to author blog posts.  I&rsquo;m using <a href="http://markdownpad.com/">MakrdownPad 2</a> on Windows and it is very slick.</p>
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
 <span class="glyphicon glyphicon-calendar"></span> <time datetime="2013-12-31T14:04:31-08:00" pubdate data-updated="true">Dec 31<span>st</span>, 2013</time>
         
            | <a href="/blog/2013/12/31/blog-moving-to-github/#disqus_thread"
@@ -181,46 +232,6 @@
 
         </article>
       
-      
-        <article class="post">
-          
-  <header class="page-header">
-    
-      <p class="meta text-muted text-uppercase">
-        
-
-
-
-
-
-
-
-
-
-
-
-
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-04-04T00:00:00-07:00" pubdate data-updated="true">Apr 4<span>th</span>, 2010</time>
-        
-           | <a href="/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/#disqus_thread"
-             data-disqus-identifier="http://mostlyblather.com/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/">Comments</a>
-        
-      </p>
-    
-    
-      <h1 class="entry-title"><a href="/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/">Scala With Querulous vs. Java With Spring JdbcTemplate</a></h1>
-    
-  </header>
-
-
-  <div class="entry-content clearfix"><p>While (<a href="http://www.mostlyblather.com/2010/03/scala-external-dsl-and-combinator.html">still</a>) looking around for a Scala SQL equivalent of iBatis, I found <a href="http://stackoverflow.com/questions/1362748/wanted-good-examples-of-scala-database-persistence">this post</a> on stackoverflow.&#160; Daniel’s answer let me to <a href="http://github.com/nkallen/querulous#readme">Querulous</a>.&#160; Several years ago I used the Spring Framework JdbcTemplate and it worked fine, but it was kind of clunky.&#160; That experience with JdbcTemplate led directly to using iBatis on that very same project.&#160; I have been mostly working with Hibernate/JPA since then, but for a certain class of problems, a SQL centric solution seems a better fit that a full blown ORM.</p>  <p>After looking at Querulous, and seeing how it manages to de-clutter the anonymous inner class clunkyness that is JdbcTemplate I’m left wondering if this isn’t the way I should go.</p>  <p>Here is a quick example from the <a href="http://static.springsource.org/spring/docs/2.5.x/reference/jdbc.html#jdbc-JdbcTemplate">JdbcTemplate</a> documentation in Java:</p>  <pre class="brush: java">Collection actors = this.jdbcTemplate.query(<br />    &quot;select first_name, surname from t_actor&quot;,<br />    new RowMapper() {<br /><br />        public Object mapRow(ResultSet rs, int rowNum) throws SQLException {<br />            Actor actor = new Actor();<br />            actor.setFirstName(rs.getString(&quot;first_name&quot;));<br />            actor.setSurname(rs.getString(&quot;surname&quot;));<br />            return actor;<br />        }<br />    });</pre><br /><br /><p>Here is the equivalent with Querulous in Scala:</p><br /><br /><pre class="brush: scala">  val actors = queryEvaluator.select(&quot;select first_name, surname from t_actor&quot;) { row =&gt;<br />    new Actor(row.getString(&quot;first_name&quot;), row.getString(&quot;surname&quot;))<br />  }</pre><br /><br /><p>Simple and easy to understand.&#160; Can’t beat that.</p>
-</div>
-  
-  
-
-
-        </article>
-      
     </div>
 
     <ul class="pager">
@@ -244,11 +255,11 @@
   
   <div id="recent_posts" class="list-group">
     
+    <a class="list-group-item " href="/blog/2014/01/03/blog-migration-recap/">Blog Migration Recap</a>
+    
     <a class="list-group-item " href="/blog/2013/12/31/blog-moving-to-github/">Blog Moving to Github</a>
     
     <a class="list-group-item " href="/blog/2010/05/02/grails-and-dbunit-integration-testing/">Grails and DBUnit Integration Testing</a>
-    
-    <a class="list-group-item " href="/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/">Scala With Querulous vs. Java With Spring JdbcTemplate</a>
     
   </div>
 </section>

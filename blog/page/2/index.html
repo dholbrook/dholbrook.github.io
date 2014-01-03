@@ -114,6 +114,46 @@
 
 
 
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-04-04T00:00:00-07:00" pubdate data-updated="true">Apr 4<span>th</span>, 2010</time>
+        
+           | <a href="/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/#disqus_thread"
+             data-disqus-identifier="http://mostlyblather.com/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/">Comments</a>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/">Scala With Querulous vs. Java With Spring JdbcTemplate</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>While (<a href="http://www.mostlyblather.com/2010/03/scala-external-dsl-and-combinator.html">still</a>) looking around for a Scala SQL equivalent of iBatis, I found <a href="http://stackoverflow.com/questions/1362748/wanted-good-examples-of-scala-database-persistence">this post</a> on stackoverflow.&#160; Daniel’s answer let me to <a href="http://github.com/nkallen/querulous#readme">Querulous</a>.&#160; Several years ago I used the Spring Framework JdbcTemplate and it worked fine, but it was kind of clunky.&#160; That experience with JdbcTemplate led directly to using iBatis on that very same project.&#160; I have been mostly working with Hibernate/JPA since then, but for a certain class of problems, a SQL centric solution seems a better fit that a full blown ORM.</p>  <p>After looking at Querulous, and seeing how it manages to de-clutter the anonymous inner class clunkyness that is JdbcTemplate I’m left wondering if this isn’t the way I should go.</p>  <p>Here is a quick example from the <a href="http://static.springsource.org/spring/docs/2.5.x/reference/jdbc.html#jdbc-JdbcTemplate">JdbcTemplate</a> documentation in Java:</p>  <pre class="brush: java">Collection actors = this.jdbcTemplate.query(<br />    &quot;select first_name, surname from t_actor&quot;,<br />    new RowMapper() {<br /><br />        public Object mapRow(ResultSet rs, int rowNum) throws SQLException {<br />            Actor actor = new Actor();<br />            actor.setFirstName(rs.getString(&quot;first_name&quot;));<br />            actor.setSurname(rs.getString(&quot;surname&quot;));<br />            return actor;<br />        }<br />    });</pre><br /><br /><p>Here is the equivalent with Querulous in Scala:</p><br /><br /><pre class="brush: scala">  val actors = queryEvaluator.select(&quot;select first_name, surname from t_actor&quot;) { row =&gt;<br />    new Actor(row.getString(&quot;first_name&quot;), row.getString(&quot;surname&quot;))<br />  }</pre><br /><br /><p>Simple and easy to understand.&#160; Can’t beat that.</p>
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
 <span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-03-21T00:00:00-07:00" pubdate data-updated="true">Mar 21<span>st</span>, 2010</time>
         
            | <a href="/blog/2010/03/21/scala-external-dsl-and-combinator-parsing-experimentation/#disqus_thread"
@@ -175,46 +215,6 @@
 
         </article>
       
-      
-        <article class="post">
-          
-  <header class="page-header">
-    
-      <p class="meta text-muted text-uppercase">
-        
-
-
-
-
-
-
-
-
-
-
-
-
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2010-02-28T00:00:00-08:00" pubdate data-updated="true">Feb 28<span>th</span>, 2010</time>
-        
-           | <a href="/blog/2010/02/28/scala-with-resteasy-%28jax-rs%29/#disqus_thread"
-             data-disqus-identifier="http://mostlyblather.com/blog/2010/02/28/scala-with-resteasy-%28jax-rs%29/">Comments</a>
-        
-      </p>
-    
-    
-      <h1 class="entry-title"><a href="/blog/2010/02/28/scala-with-resteasy-%28jax-rs%29/">Scala With RESTEasy (JAX-RS)</a></h1>
-    
-  </header>
-
-
-  <div class="entry-content clearfix"><p>In the <a href="http://johnnycoder.com/blog/2010/01/06/how-to-organize-a-programming-language-club/">&quot;code club&quot; / &quot;dojo&quot;</a> or whatever you want to call it that Ben (aka <a href="http://johnnycoder.com/blog/">Johnny Coder</a>) organized we have been learning about Scala the last few weeks. I have been puttering with <a href="http://www.scala-lang.org/">Scala</a> on my own for about a year now, and it has been fun to engage with other folk in the learning process. We have mostly been doing a mix of <a href="http://projecteuler.net/">Project Euler</a> and the <a href="http://aperiodic.net/phil/scala/s-99/">S-99</a> problems as exercises. Those problems are fun, but they don&#8217;t really reflect the kind of day to day programming tasks that I am usually engaged in. </p>  <p>To scratch that slightly more practical itch, I decided to see how well Scala fits in with other tools in the Java ecosystem. The Java ecosystem being broad, and my Scala kung fu being not that strong, all I have are some possibly interesting bits I discovered while trying to get Scala and <a href="http://www.jboss.org/resteasy">RESTEasy</a> working together.&#160; I picked RESTEasy because in the middle of reading <a href="http://oreilly.com/catalog/9780596158040/">RESTful Java with JAX-RS</a>.</p>  <p>I started off with an <a href="https://resteasy.svn.sourceforge.net/svnroot/resteasy/tags/RESTEASY_JAXRS_1_2_GA/examples/oreilly-workbook/ex11_2/">existing</a> example project from chapter 11 in the RESTEasy book. I added the <a href="http://scala-tools.org/mvnsites/maven-scala-plugin/">Scala plugin</a> to the maven build, and I was off. </p>  <p>The first class I converted over was a JAXB annotated class <a href="https://resteasy.svn.sourceforge.net/svnroot/resteasy/tags/RESTEASY_JAXRS_1_2_GA/examples/oreilly-workbook/ex11_2/src/main/java/com/restfully/shop/domain/Customer.java">com.restfully.shop.domain.Customer</a></p>  <p>I ran into a few things that caused me problems.&#160; The first was this compiler message:</p>  <pre class="brush: text">&quot;';' expected but ',' found&quot;</pre><br /><br /><p>At the @XMLType annotation line.&#160; The resolution was to switch from using the Array literal &quot;{}&quot; Java syntax to the Scala Array object.</p><br /><br /><p>I also got a JAXB runtime error during the JUnit tests:</p><br /><br /><pre class="brush: text">....<br />Caused by: com.sun.xml.bind.v2.runtime.IllegalAnnotationsException: 15 counts of IllegalAnnotationExceptions<br />There are two properties named ....</pre><br /><br /><p>I resolved that by using the @XmlAccessorType(XmlAccessType.FIELD) annotation.</p><br /><br /><p>For compatibility with the existing code that expected Java Bean style property access, I added the @BeanProperty annotation.&#160;&#160; The annotation causes Scala to automatically generate get/set methods. </p><br /><br /><p>Here is the java version of Customer:</p><br /><br /><pre class="brush: java">package com.restfully.shop.domain;<br /><br />import javax.xml.bind.annotation.XmlAttribute;<br />import javax.xml.bind.annotation.XmlElement;<br />import javax.xml.bind.annotation.XmlRootElement;<br />import javax.xml.bind.annotation.XmlType;<br /><br />@XmlRootElement(name = &quot;customer&quot;)<br />@XmlType(propOrder = {&quot;firstName&quot;, &quot;lastName&quot;, &quot;street&quot;, &quot;city&quot;, &quot;state&quot;, &quot;zip&quot;, &quot;country&quot;})<br />public class Customer<br />{<br />   private int id;<br />   private String firstName;<br />   private String lastName;<br />   private String street;<br />   private String city;<br />   private String state;<br />   private String zip;<br />   private String country;<br /><br />   @XmlAttribute<br />   public int getId()<br />   {<br />      return id;<br />   }<br /><br />   public void setId(int id)<br />   {<br />      this.id = id;<br />   }<br /><br />   @XmlElement(name = &quot;first-name&quot;)<br />   public String getFirstName()<br />   {<br />      return firstName;<br />   }<br /><br />   public void setFirstName(String firstName)<br />   {<br />      this.firstName = firstName;<br />   }<br /><br />   @XmlElement(name = &quot;last-name&quot;)<br />   public String getLastName()<br />   {<br />      return lastName;<br />   }<br /><br />   public void setLastName(String lastName)<br />   {<br />      this.lastName = lastName;<br />   }<br /><br />   @XmlElement<br />   public String getStreet()<br />   {<br />      return street;<br />   }<br /><br />   public void setStreet(String street)<br />   {<br />      this.street = street;<br />   }<br /><br />   @XmlElement<br />   public String getCity()<br />   {<br />      return city;<br />   }<br /><br />   public void setCity(String city)<br />   {<br />      this.city = city;<br />   }<br /><br />   @XmlElement<br />   public String getState()<br />   {<br />      return state;<br />   }<br /><br />   public void setState(String state)<br />   {<br />      this.state = state;<br />   }<br /><br />   @XmlElement<br />   public String getZip()<br />   {<br />      return zip;<br />   }<br /><br />   public void setZip(String zip)<br />   {<br />      this.zip = zip;<br />   }<br /><br />   @XmlElement<br />   public String getCountry()<br />   {<br />      return country;<br />   }<br /><br />   public void setCountry(String country)<br />   {<br />      this.country = country;<br />   }<br /><br />   @Override<br />   public String toString()<br />   {<br />      return &quot;Customer{&quot; +<br />              &quot;id=&quot; + id +<br />              &quot;, firstName='&quot; + firstName + '\'' +<br />              &quot;, lastName='&quot; + lastName + '\'' +<br />              &quot;, street='&quot; + street + '\'' +<br />              &quot;, city='&quot; + city + '\'' +<br />              &quot;, state='&quot; + state + '\'' +<br />              &quot;, zip='&quot; + zip + '\'' +<br />              &quot;, country='&quot; + country + '\'' +<br />              '}';<br />   }<br />}</pre><br /><br /><p>Here is my Scala conversion of Customer:</p><br /><br /><pre class="brush: scala">package com.restfully.shop.domain<br /><br />import javax.xml.bind.annotation.XmlAttribute<br />import javax.xml.bind.annotation.XmlElement<br />import javax.xml.bind.annotation.XmlRootElement<br />import javax.xml.bind.annotation.XmlType<br />import javax.xml.bind.annotation.XmlAccessorType<br />import javax.xml.bind.annotation.XmlAccessType<br /><br />import scala.reflect.BeanProperty<br /><br />@XmlRootElement(name = &quot;customer&quot;)<br />@XmlType(propOrder = Array(&quot;firstName&quot;, &quot;lastName&quot;, &quot;street&quot;, &quot;city&quot;, &quot;state&quot;, &quot;zip&quot;, &quot;country&quot;))<br />@XmlAccessorType(XmlAccessType.FIELD)<br />class Customer {<br /><br />   @XmlAttribute<br />   @BeanProperty<br />   var id: Int = _<br />   <br />   @XmlElement(name = &quot;first-name&quot;)<br />   @BeanProperty<br />   var firstName: String = _<br />   <br />   @XmlElement(name = &quot;last-name&quot;)<br />   @BeanProperty<br />   var lastName: String = _<br />   <br />   @XmlElement<br />   @BeanProperty<br />   var street: String = _<br />   <br />   @XmlElement<br />   @BeanProperty<br />   var city: String = _<br />   <br />   @XmlElement<br />   @BeanProperty<br />   var state: String = _<br />   <br />   @XmlElement<br />   @BeanProperty<br />   var zip: String = _<br /><br />   @XmlElement<br />   @BeanProperty<br />   var country: String = _<br /><br />   override def toString = <br />    &quot;Customer{&quot; +<br />    &quot;id=&quot; + id +<br />    &quot;, firstName='&quot; + firstName + '\'' +<br />    &quot;, lastName='&quot; + lastName + '\'' +<br />    &quot;, street='&quot; + street + '\'' +<br />    &quot;, city='&quot; + city + '\'' +<br />    &quot;, state='&quot; + state + '\'' +<br />    &quot;, zip='&quot; + zip + '\'' +<br />    &quot;, country='&quot; + country + '\'' +<br />    '}'<br />   <br />}</pre><br /><br /><p>The next class I converted was <a href="https://resteasy.svn.sourceforge.net/svnroot/resteasy/tags/RESTEASY_JAXRS_1_2_GA/examples/oreilly-workbook/ex11_2/src/main/java/com/restfully/shop/domain/Customers.java">com.restfully.shop.domain.Customers</a></p><br /><br /><p>This conversion was very similar, but it was dealing with collections.&#160; I found that Scala 2.8 has a new object <a href="http://www.scala-lang.org/archives/downloads/distrib/files/nightly/docs/library/scala/collection/JavaConversions$.html">scala.collection.JavaConversions</a> that contains many implicit conversion for Java collections.&#160; </p><br /><br /><p>Here is the Java version of Customers:</p><br /><br /><pre class="brush: java">package com.restfully.shop.domain;<br /><br />import javax.xml.bind.annotation.XmlElementRef;<br />import javax.xml.bind.annotation.XmlRootElement;<br />import javax.xml.bind.annotation.XmlTransient;<br />import java.util.ArrayList;<br />import java.util.Collection;<br />import java.util.List;<br /><br />/**<br /> * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a><br /> * @version $Revision: 1 $<br /> */<br />@XmlRootElement(name = &quot;customers&quot;)<br />public class Customers<br />{<br />   protected Collection<customer> customers = new ArrayList<customer>();<br />   protected List<link /> links;<br /><br />   @XmlElementRef<br />   public Collection<customer> getCustomers()<br />   {<br />      return customers;<br />   }<br /><br />   public void setCustomers(Collection<customer> customers)<br />   {<br />      this.customers = customers;<br />   }<br /><br />   @XmlElementRef<br />   public List<link /> getLinks()<br />   {<br />      return links;<br />   }<br /><br />   public void setLinks(List<link /> links)<br />   {<br />      this.links = links;<br />   }<br /><br />   @XmlTransient<br />   public String getNext()<br />   {<br />      if (links == null) return null;<br />      for (Link link : links)<br />      {<br />         if (&quot;next&quot;.equals(link.getRelationship())) return link.getHref();<br />      }<br />      return null;<br />   }<br /><br />   @XmlTransient<br />   public String getPrevious()<br />   {<br />      if (links == null) return null;<br />      for (Link link : links)<br />      {<br />         if (&quot;previous&quot;.equals(link.getRelationship())) return link.getHref();<br />      }<br />      return null;<br />   }<br /><br />}</pre><br /><br /><p>Here is my Scala conversion of Customers:</p><br /><br /><pre class="brush: scala">package com.restfully.shop.domain<br /><br />import java.util.{ArrayList =&gt; JArrayList}<br />import java.util.{Collection =&gt; JCollection}<br />import java.util.{List =&gt; JList}<br /><br />import javax.xml.bind.annotation.XmlElementRef<br />import javax.xml.bind.annotation.XmlRootElement<br />import javax.xml.bind.annotation.XmlTransient<br />import javax.xml.bind.annotation.XmlAccessorType<br />import javax.xml.bind.annotation.XmlAccessType<br /><br />import scala.collection.Iterable<br />import scala.collection.JavaConversions._<br />import scala.collection.mutable.Buffer<br /><br />@XmlRootElement(name = &quot;customers&quot;)<br />@XmlAccessorType(XmlAccessType.PROPERTY)<br />class Customers {<br /><br />  var customers = Iterable[Customer]() <br />  var links: Buffer[Link] = Buffer()<br />  <br />  @XmlElementRef<br />  def getCustomers: JCollection[Customer] = customers<br />  def setCustomers(customers: JCollection[Customer]) = {<br />    this.customers = customers<br />  }<br /> <br />  @XmlElementRef<br />  def getLinks: JList[Link] = links<br />  def setLinks(links: JList[Link]) = {<br />    this.links = links<br />  }<br />  <br />  @XmlTransient<br />  def getNext(): String = findHref(&quot;next&quot;)<br /> <br />  @XmlTransient<br />  def getPrevious(): String = findHref(&quot;previous&quot;)<br />  <br />  private def findHref(rname: String): String = {<br />    val rel = links.filter(_.getRelationship == rname)<br />    rel match {<br />      case Buffer() =&gt; null<br />      case _        =&gt; rel.head.getHref<br />    }<br />  }<br />  <br />}</pre><br /><br /><p>That’s about as far as I got this weekend.&#160; I guess I was actually mostly working with JAXB this time.&#160; The same example code has JPA as was as JAX-RS, and I’m going to try and convert the entire project to Scala, and if I do, I’ll upload it to BitBucket.</p>  
-</div>
-  
-  
-
-
-        </article>
-      
     </div>
 
     <ul class="pager">
@@ -238,11 +238,11 @@
   
   <div id="recent_posts" class="list-group">
     
+    <a class="list-group-item " href="/blog/2014/01/03/blog-migration-recap/">Blog Migration Recap</a>
+    
     <a class="list-group-item " href="/blog/2013/12/31/blog-moving-to-github/">Blog Moving to Github</a>
     
     <a class="list-group-item " href="/blog/2010/05/02/grails-and-dbunit-integration-testing/">Grails and DBUnit Integration Testing</a>
-    
-    <a class="list-group-item " href="/blog/2010/04/04/scala-with-querulous-vs.-java-with-spring-jdbctemplate/">Scala With Querulous vs. Java With Spring JdbcTemplate</a>
     
   </div>
 </section>

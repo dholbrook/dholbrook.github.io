@@ -4,7 +4,7 @@
   <title><![CDATA[Mostly Blather]]></title>
   <link href="http://mostlyblather.com/atom.xml" rel="self"/>
   <link href="http://mostlyblather.com/"/>
-  <updated>2014-01-01T10:41:00-08:00</updated>
+  <updated>2014-01-03T12:18:35-08:00</updated>
   <id>http://mostlyblather.com/</id>
   <author>
     <name><![CDATA[David Holbrook]]></name>
@@ -12,6 +12,26 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Blog Migration Recap]]></title>
+    <link href="http://mostlyblather.com/blog/2014/01/03/blog-migration-recap/"/>
+    <updated>2014-01-03T12:05:22-08:00</updated>
+    <id>http://mostlyblather.com/blog/2014/01/03/blog-migration-recap</id>
+    <content type="html"><![CDATA[<p>The conversion from Blogger to <a href="http://octopress.org/">Octopress</a>/<a href="http://jekyllrb.com/">Jekyll</a> went a lot smoother than I expected it to.  The DNS now seems to be working correctly, I&rsquo;ve updated Google Analytics to use the new site, and I added some redirect pages that match the old site so searches can still find the old content.</p>
+
+<p>I still have a few things I want to do.</p>
+
+<ul>
+<li>Change the default Octopress favicon.</li>
+<li>Add a top categories sidebar</li>
+<li>Categorize old articles</li>
+</ul>
+
+
+<p>As an aside, I&rsquo;m really enjoying using Markdown to author blog posts.  I&rsquo;m using <a href="http://markdownpad.com/">MakrdownPad 2</a> on Windows and it is very slick.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Blog Moving To Github]]></title>
