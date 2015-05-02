@@ -3,7 +3,7 @@ layout: default
 ---
 
 <div class="row">
-  <div class="page-content {% unless page.sidebar == false or site.page_asides == empty and site.default_asides == empty %}col-md-9{% endunless %}">
+  <div class="page-content {% unless page.sidebar == false or site.page_asides == empty and site.default_asides == empty %}col-md-9{% else %}col-md-12{% endunless %}">
     <article role="article">
       {% unless page.no_header %}
         <header class="page-header">
@@ -40,7 +40,7 @@ layout: default
     </article>
     {% if site.disqus_short_name and page.comments == true %}
       <section>
-        <h1>Comments</h1>
+        <h2>Comments</h2>
         <div id="disqus_thread" aria-live="polite">{% include post/disqus_thread.html %}</div>
       </section>
     {% endif %}
