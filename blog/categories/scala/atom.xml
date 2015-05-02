@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: scala, | Mostly Blather]]></title>
+  <title><![CDATA[Category: Scala | Mostly Blather]]></title>
   <link href="http://mostlyblather.com/blog/categories/scala/atom.xml" rel="self"/>
   <link href="http://mostlyblather.com/"/>
-  <updated>2014-01-05T11:47:14-08:00</updated>
+  <updated>2015-05-02T12:42:12-07:00</updated>
   <id>http://mostlyblather.com/</id>
   <author>
     <name><![CDATA[David Holbrook]]></name>
@@ -41,108 +41,91 @@
 
 <p>This is an interesting method in the Java implementation.  It is designed to always take the same amount of time to determine equality regardless of the length of the arrays being compared. Additionally it uses the XOR operator <code>^</code> to produce consistent branching.  I suspect using XOR in Java this way is somewhat controversial, regardless I used a similar approach in my Scala implementation.</p>
 
-<p>``` java Java: slowEquals()</p>
-
-<pre><code>private static boolean slowEquals(byte[] a, byte[] b)
-{
-    int diff = a.length ^ b.length;
-    for(int i = 0; i &lt; a.length &amp;&amp; i &lt; b.length; i++)
-        diff |= a[i] ^ b[i];
-    return diff == 0;
-}
+<pre><code class="java Java: slowEquals()">    private static boolean slowEquals(byte[] a, byte[] b)
+    {
+        int diff = a.length ^ b.length;
+        for(int i = 0; i &lt; a.length &amp;&amp; i &lt; b.length; i++)
+            diff |= a[i] ^ b[i];
+        return diff == 0;
+    }
 </code></pre>
 
-<p><code>``
-The most significant change in the Scala port is making</code>diff<code>immutable.  The same result is achieved by folding over a range, and using an accumulator seeded by the initial test of</code>a.length ^ b.length`.</p>
+<p>The most significant change in the Scala port is making <code>diff</code> immutable.  The same result is achieved by folding over a range, and using an accumulator seeded by the initial test of <code>a.length ^ b.length</code>.</p>
 
-<p>``` scala Scala: slowEquals()</p>
-
-<pre><code>private def slowEquals(a: Array[Byte], b: Array[Byte]): Boolean = {
-  val range = 0 until scala.math.min(a.length, b.length)
-  val diff = range.foldLeft(a.length ^ b.length) {
-    case (acc, i) =&gt; acc | a(i) ^ b(i)
-  }
-  diff == 0
-}
+<pre><code class="scala Scala: slowEquals()">    private def slowEquals(a: Array[Byte], b: Array[Byte]): Boolean = {
+      val range = 0 until scala.math.min(a.length, b.length)
+      val diff = range.foldLeft(a.length ^ b.length) {
+        case (acc, i) =&gt; acc | a(i) ^ b(i)
+      }
+      diff == 0
+    }
 </code></pre>
-
-<p>```</p>
 
 <h3>fromHex / toHex</h3>
 
 <p>The utility functions <code>fromHex</code> and <code>toHex</code> saw a big size reduction.</p>
 
-<p>``` java Java: fromHex() and toHex()</p>
-
-<pre><code>private static byte[] fromHex(String hex)
-{
-    byte[] binary = new byte[hex.length() / 2];
-    for(int i = 0; i &lt; binary.length; i++)
+<pre><code class="java Java: fromHex() and toHex()">
+    private static byte[] fromHex(String hex)
     {
-        binary[i] = (byte)Integer.parseInt(hex.substring(2*i, 2*i+2), 16);
+        byte[] binary = new byte[hex.length() / 2];
+        for(int i = 0; i &lt; binary.length; i++)
+        {
+            binary[i] = (byte)Integer.parseInt(hex.substring(2*i, 2*i+2), 16);
+        }
+        return binary;
     }
-    return binary;
-}
 
-private static String toHex(byte[] array)
-{
-    BigInteger bi = new BigInteger(1, array);
-    String hex = bi.toString(16);
-    int paddingLength = (array.length * 2) - hex.length();
-    if(paddingLength &gt; 0) 
-        return String.format("%0" + paddingLength + "d", 0) + hex;
-    else
-        return hex;
-}
+    private static String toHex(byte[] array)
+    {
+        BigInteger bi = new BigInteger(1, array);
+        String hex = bi.toString(16);
+        int paddingLength = (array.length * 2) - hex.length();
+        if(paddingLength &gt; 0) 
+            return String.format("%0" + paddingLength + "d", 0) + hex;
+        else
+            return hex;
+    }
 </code></pre>
 
-<p>```</p>
+<pre><code class="scala Scala: fromHex() and toHex()">
+    private def fromHex(hex: String): Array[Byte] = 
+      hex.sliding(2, 2).toArray.map(Integer.parseInt(_, 16).toByte)
 
-<p>``` scala Scala: fromHex() and toHex()</p>
-
-<pre><code>private def fromHex(hex: String): Array[Byte] = 
-  hex.sliding(2, 2).toArray.map(Integer.parseInt(_, 16).toByte)
-
-private def toHex(bytes: Array[Byte]): String = 
-  bytes.map("%02X" format _).mkString
+    private def toHex(bytes: Array[Byte]): String = 
+      bytes.map("%02X" format _).mkString
 </code></pre>
-
-<p>```</p>
 
 <h3>Testing</h3>
 
 <p>I tested the code by using it in conjunction with the existing Java implementation.  Verifying that passwords created by each side were interoperable with the other.  I used <a href="http://www.scalacheck.org/">ScalaCheck</a> to randomly generate a set of passwords to test.</p>
 
-<p>```scala PasswordHashTest</p>
+<pre><code class="scala PasswordHashTest">    package scalapasswordhash
 
-<pre><code>package scalapasswordhash
+    import org.scalacheck.Gen
+    import org.scalacheck.Gen._
+    import org.scalatest.FunSuite
+    import org.scalatest.prop.GeneratorDrivenPropertyChecks
+    import passwordhash.{PasswordHash =&gt; JPasswordHash}
 
-import org.scalacheck.Gen
-import org.scalacheck.Gen._
-import org.scalatest.FunSuite
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import passwordhash.{PasswordHash =&gt; JPasswordHash}
+    class PasswordHashTest extends FunSuite with GeneratorDrivenPropertyChecks  {
 
-class PasswordHashTest extends FunSuite with GeneratorDrivenPropertyChecks  {
+      test("hash generated from Java should validate with Scala") {
+        forAll (identifier) { (password: String) =&gt;
+          val h1 = JPasswordHash.createHash(password)
+          assert(PasswordHash.validatePassword(password, h1))
+        }
+      }
 
-  test("hash generated from Java should validate with Scala") {
-    forAll (identifier) { (password: String) =&gt;
-      val h1 = JPasswordHash.createHash(password)
-      assert(PasswordHash.validatePassword(password, h1))
+      test("hash generated from Scala should validate with Java") {
+        forAll (identifier) { (password: String) =&gt;
+          val h1 = PasswordHash.createHash(password)
+          assert(JPasswordHash.validatePassword(password, h1))
+        }
+      }  
+
     }
-  }
-
-  test("hash generated from Scala should validate with Java") {
-    forAll (identifier) { (password: String) =&gt;
-      val h1 = PasswordHash.createHash(password)
-      assert(JPasswordHash.validatePassword(password, h1))
-    }
-  }  
-
-}
 </code></pre>
-
-<p>```</p>
 ]]></content>
   </entry>
   
