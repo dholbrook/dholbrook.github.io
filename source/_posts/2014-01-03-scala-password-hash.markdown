@@ -3,7 +3,7 @@ layout: post
 title: "Scala Password Hash"
 date: 2014-01-03 13:39:19 -0800
 comments: true
-categories: scala, security
+categories: scala security
 
 ---
 
