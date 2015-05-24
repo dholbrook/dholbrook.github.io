@@ -38,7 +38,7 @@ rdiscount:
   extensions:
     - autolink
     - footnotes
-    - smart
+#    - smart
 highlighter: pygments # default python pygments have been replaced by pygments.rb
 
 paginate: 3          # Posts per page on the blog index
@@ -49,6 +49,11 @@ excerpt_separator: "<!--more-->"
 
 titlecase: true       # Converts page and post titles to titlecase
 
+gems: [jekyll-mermaid]
+
+mermaid:
+  src: '/javascripts/mermaid.full.min.js'
+  
 # list each of the sidebar modules you want to include, in the order you want them to appear.
 # To add custom asides, create files in /source/_includes/custom/asides/ and add them to the list like 'custom/asides/custom_aside_name.html'
 default_asides: [asides/recent_posts.html, custom/asides/category_list.html, asides/github.html, asides/delicious.html, asides/pinboard.html, asides/googleplus.html]
