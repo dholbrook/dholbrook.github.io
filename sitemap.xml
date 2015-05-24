@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://mostlyblather.com/blog/2015/05/23/mermaid-jekyll-octopress/</loc>
+    <lastmod>2015-05-23T12:00:00-07:00</lastmod>
+  </url>
+  <url>
     <loc>http://mostlyblather.com/blog/2014/01/03/scala-password-hash/</loc>
     <lastmod>2014-01-03T13:39:19-08:00</lastmod>
   </url>
@@ -96,6 +100,24 @@
   </url>
   <url>
     <loc>http://mostlyblather.com/blog/categories/security/</loc>
+  </url>
+  <url>
+    <loc>http://mostlyblather.com/blog/categories/jekyll/</loc>
+  </url>
+  <url>
+    <loc>http://mostlyblather.com/blog/categories/octopress/</loc>
+  </url>
+  <url>
+    <loc>http://mostlyblather.com/blog/categories/mermaid/</loc>
+  </url>
+  <url>
+    <loc>http://mostlyblather.com/posts/2/</loc>
+  </url>
+  <url>
+    <loc>http://mostlyblather.com/posts/3/</loc>
+  </url>
+  <url>
+    <loc>http://mostlyblather.com/posts/4/</loc>
   </url>
   <url>
     <loc>http://mostlyblather.com/assets/bootstrap/examples/carousel/index.html</loc>

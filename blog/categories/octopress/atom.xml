@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Octopress | Mostly Blather]]></title>
+  <link href="http://mostlyblather.com/blog/categories/octopress/atom.xml" rel="self"/>
+  <link href="http://mostlyblather.com/"/>
+  <updated>2015-05-24T16:37:41-07:00</updated>
+  <id>http://mostlyblather.com/</id>
+  <author>
+    <name><![CDATA[David Holbrook]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Mermaid Octopress Integration]]></title>
+    <link href="http://mostlyblather.com/blog/2015/05/23/mermaid-jekyll-octopress/"/>
+    <updated>2015-05-23T12:00:00-07:00</updated>
+    <id>http://mostlyblather.com/blog/2015/05/23/mermaid-jekyll-octopress</id>
+    <content type="html"><![CDATA[<p><a href="http://knsv.github.io/mermaid/">Mermaid</a> provides &#8220;generation of diagrams and flowcharts from text in a similar manner as markdown&#8221;.  I wanted to add charting support to the blog (running on <a href="http://octopress.org/">Octopress</a>), these are the steps I took to get things working.</p>
+
+<h3>download</h3>
+
+<p>The best place I found to download mermaid is the <a href="https://github.com/knsv/mermaid/tree/master/dist">dist folder</a> of the mermaid github repo.</p>
+
+<ul>
+<li><code>mermaid.full.min.js</code> to <code>/source/javascripts/mermaid.full.min.js</code></li>
+<li><code>mermaid.css</code> to <code>/source/stylesheets/mermaid.css</code></li>
+</ul>
+
+
+<h3>integrate</h3>
+
+<p>I found the (jekyll-mermaid)[<a href="https://github.com/jasonbellamy/jekyll-mermaid">https://github.com/jasonbellamy/jekyll-mermaid</a>] plugin and installed it.</p>
+
+<p>In addition to the instructions on the plugin page I had to mannuall add an entry into the Gemfile for rake to pick it up:</p>
+
+<pre><code class="ruby">group :development do
+  gem 'rake', '~&gt; 10.0'
+  gem 'jekyll', '~&gt; 2.0'
+  # ...snip
+  gem 'jekyll-mermaid', '~&gt; 1.0.0'
+end
+</code></pre>
+
+<h3>problems encountered</h3>
+
+<ul>
+<li>double dash requires escape (rdiscount related problem)
+
+<ul>
+<li>This works <code>A\-\-&gt;B</code></li>
+<li>This will not work <code>A--&gt;B</code></li>
+</ul>
+</li>
+</ul>
+
+
+<h3>test diagrams</h3>
+
+<p></p>
+
+<pre>
+{% mermaid %}
+graph LR;
+    A\-\->B;
+{% endmermaid %}
+</pre>
+
+
+<p></p>
+
+<p><script src="/javascripts/mermaid.full.min.js"></script><div class="mermaid">
+graph LR;
+    A&#8211;>B;
+</div></p>
+
+<p></p>
+
+<pre>
+{% mermaid %}
+graph TD;
+    A\-\->B;
+    A\-\->C;
+    B\-\->D;
+    C\-\->D;
+{% endmermaid %}
+</pre>
+
+
+<p></p>
+
+<p><script src="/javascripts/mermaid.full.min.js"></script><div class="mermaid">
+graph TD;
+    A&#8211;>B;
+    A&#8211;>C;
+    B&#8211;>D;
+    C&#8211;>D;
+</div></p>
+
+<p></p>
+
+<pre>
+{% mermaid %}
+sequenceDiagram
+    Alice->>John: Hello John, how are you?
+    John\-->>Alice: Great!
+{% endmermaid %}
+</pre>
+
+
+<p></p>
+
+<p><script src="/javascripts/mermaid.full.min.js"></script><div class="mermaid">
+sequenceDiagram
+    Alice->>John: Hello John, how are you?
+    John&#8211;>>Alice: Great!
+</div></p>
+]]></content>
+  </entry>
+  
+</feed>

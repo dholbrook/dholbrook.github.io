@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Security | Mostly Blather]]></title>
   <link href="http://mostlyblather.com/blog/categories/security/atom.xml" rel="self"/>
   <link href="http://mostlyblather.com/"/>
-  <updated>2015-05-02T12:42:12-07:00</updated>
+  <updated>2015-05-24T16:37:41-07:00</updated>
   <id>http://mostlyblather.com/</id>
   <author>
     <name><![CDATA[David Holbrook]]></name>
@@ -18,7 +18,7 @@
     <link href="http://mostlyblather.com/blog/2014/01/03/scala-password-hash/"/>
     <updated>2014-01-03T13:39:19-08:00</updated>
     <id>http://mostlyblather.com/blog/2014/01/03/scala-password-hash</id>
-    <content type="html"><![CDATA[<p>I&rsquo;m working on a spray framework REST based tech demo project, and I want to securely store passwords as salted hashes in a database.  I took a look around at existing projects, and couldn&rsquo;t find quite what I was looking for.</p>
+    <content type="html"><![CDATA[<p>I&#8217;m working on a spray framework REST based tech demo project, and I want to securely store passwords as salted hashes in a database.  I took a look around at existing projects, and couldn&#8217;t find quite what I was looking for.</p>
 
 <ul>
 <li>simple to use and understand</li>
@@ -29,7 +29,7 @@
 
 <p>The closest thing I found was this: <a href="https://crackstation.net/hashing-security.htm#javasourcecode">Java PBKDF2 Password Hashing Code</a></p>
 
-<p>But it is written in Java&hellip;. So I took a crack at porting it to Scala.</p>
+<p>But it is written in Java&#8230;. So I took a crack at porting it to Scala.</p>
 
 <p>It lives here on github:</p>
 

@@ -34,6 +34,8 @@
   
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 
+  <link href="/stylesheets/mermaid.css" rel="stylesheet" type="text/css">
+  
   
    <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -127,6 +129,163 @@
 
 
 
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2015-05-23T12:00:00-07:00"  data-updated="true" itemprop="datePublished dateCreated">Sat 23 May 2015, 12:00 PM</time>
+        
+           | <a href="/blog/2015/05/23/mermaid-jekyll-octopress/#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://mostlyblather.com/blog/2015/05/23/mermaid-jekyll-octopress/">Comments</a>
+        
+      </p>
+    
+    
+      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2015/05/23/mermaid-jekyll-octopress/" itemprop="url">Mermaid Octopress Integration</a></h2>
+    
+  </header>
+
+
+  <div class="entry-content clearfix" itemprop="articleBody description"><p><a href="http://knsv.github.io/mermaid/">Mermaid</a> provides &#8220;generation of diagrams and flowcharts from text in a similar manner as markdown&#8221;.  I wanted to add charting support to the blog (running on <a href="http://octopress.org/">Octopress</a>), these are the steps I took to get things working.</p>
+
+<h3>download</h3>
+
+<p>The best place I found to download mermaid is the <a href="https://github.com/knsv/mermaid/tree/master/dist">dist folder</a> of the mermaid github repo.</p>
+
+<ul>
+<li><code>mermaid.full.min.js</code> to <code>/source/javascripts/mermaid.full.min.js</code></li>
+<li><code>mermaid.css</code> to <code>/source/stylesheets/mermaid.css</code></li>
+</ul>
+
+
+<h3>integrate</h3>
+
+<p>I found the (jekyll-mermaid)[<a href="https://github.com/jasonbellamy/jekyll-mermaid">https://github.com/jasonbellamy/jekyll-mermaid</a>] plugin and installed it.</p>
+
+<p>In addition to the instructions on the plugin page I had to mannuall add an entry into the Gemfile for rake to pick it up:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">group</span> <span class="ss">:development</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;rake&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 10.0&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;jekyll&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 2.0&#39;</span>
+</span><span class='line'>  <span class="c1"># ...snip</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;jekyll-mermaid&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 1.0.0&#39;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>problems encountered</h3>
+
+<ul>
+<li>double dash requires escape (rdiscount related problem)
+
+<ul>
+<li>This works <code>A\-\-&gt;B</code></li>
+<li>This will not work <code>A--&gt;B</code></li>
+</ul>
+</li>
+</ul>
+
+
+<h3>test diagrams</h3>
+
+<pre>
+{% mermaid %}
+graph LR;
+    A\-\->B;
+{% endmermaid %}
+</pre>
+
+
+
+
+<script src="/javascripts/mermaid.full.min.js"></script>
+
+
+<div class="mermaid">
+graph LR;
+    A&#45;&#45;>B;
+</div>
+
+
+
+
+<pre>
+{% mermaid %}
+graph TD;
+    A\-\->B;
+    A\-\->C;
+    B\-\->D;
+    C\-\->D;
+{% endmermaid %}
+</pre>
+
+
+
+
+<script src="/javascripts/mermaid.full.min.js"></script>
+
+
+<div class="mermaid">
+graph TD;
+    A&#45;&#45;>B;
+    A&#45;&#45;>C;
+    B&#45;&#45;>D;
+    C&#45;&#45;>D;
+</div>
+
+
+
+
+<pre>
+{% mermaid %}
+sequenceDiagram
+    Alice->>John: Hello John, how are you?
+    John\-->>Alice: Great!
+{% endmermaid %}
+</pre>
+
+
+
+
+<script src="/javascripts/mermaid.full.min.js"></script>
+
+
+<div class="mermaid">
+sequenceDiagram
+    Alice->>John: Hello John, how are you?
+    John&#45;->>Alice: Great!
+</div>
+
+
+
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
 <span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-01-03T13:39:19-08:00"  data-updated="true" itemprop="datePublished dateCreated">Fri  3 Jan 2014,  1:39 PM</time>
         
            | <a href="/blog/2014/01/03/scala-password-hash/#disqus_thread" itemprop="discussionUrl"
@@ -140,7 +299,7 @@
   </header>
 
 
-  <div class="entry-content clearfix" itemprop="articleBody description"><p>I&rsquo;m working on a spray framework REST based tech demo project, and I want to securely store passwords as salted hashes in a database.  I took a look around at existing projects, and couldn&rsquo;t find quite what I was looking for.</p>
+  <div class="entry-content clearfix" itemprop="articleBody description"><p>I&#8217;m working on a spray framework REST based tech demo project, and I want to securely store passwords as salted hashes in a database.  I took a look around at existing projects, and couldn&#8217;t find quite what I was looking for.</p>
 
 <ul>
 <li>simple to use and understand</li>
@@ -151,7 +310,7 @@
 
 <p>The closest thing I found was this: <a href="https://crackstation.net/hashing-security.htm#javasourcecode">Java PBKDF2 Password Hashing Code</a></p>
 
-<p>But it is written in Java&hellip;. So I took a crack at porting it to Scala.</p>
+<p>But it is written in Java&#8230;. So I took a crack at porting it to Scala.</p>
 
 <p>It lives here on github:</p>
 
@@ -356,7 +515,7 @@
   </header>
 
 
-  <div class="entry-content clearfix" itemprop="articleBody description"><p>The conversion from Blogger to <a href="http://octopress.org/">Octopress</a>/<a href="http://jekyllrb.com/">Jekyll</a> went a lot smoother than I expected it to.  The DNS now seems to be working correctly, I&rsquo;ve updated Google Analytics to use the new site, and I added some redirect pages that match the old site so searches can still find the old content.</p>
+  <div class="entry-content clearfix" itemprop="articleBody description"><p>The conversion from Blogger to <a href="http://octopress.org/">Octopress</a>/<a href="http://jekyllrb.com/">Jekyll</a> went a lot smoother than I expected it to.  The DNS now seems to be working correctly, I&#8217;ve updated Google Analytics to use the new site, and I added some redirect pages that match the old site so searches can still find the old content.</p>
 
 <p>I still have a few things I want to do.</p>
 
@@ -367,53 +526,7 @@
 </ul>
 
 
-<p>As an aside, I&rsquo;m really enjoying using Markdown to author blog posts.  I&rsquo;m using <a href="http://markdownpad.com/">MakrdownPad 2</a> on Windows and it is very slick.</p>
-</div>
-  
-  
-
-
-        </article>
-      
-      
-        <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-          
-  <header class="page-header">
-    
-      <p class="meta text-muted text-uppercase">
-        
-
-
-
-
-
-
-
-
-
-
-
-
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2013-12-31T14:04:31-08:00"  data-updated="true" itemprop="datePublished dateCreated">Tue 31 Dec 2013,  2:04 PM</time>
-        
-           | <a href="/blog/2013/12/31/blog-moving-to-github/#disqus_thread" itemprop="discussionUrl"
-             data-disqus-identifier="http://mostlyblather.com/blog/2013/12/31/blog-moving-to-github/">Comments</a>
-        
-      </p>
-    
-    
-      <h2 class="entry-title" itemprop="name headline"><a href="/blog/2013/12/31/blog-moving-to-github/" itemprop="url">Blog Moving to Github</a></h2>
-    
-  </header>
-
-
-  <div class="entry-content clearfix" itemprop="articleBody description"><p>Mostly Blather is moving from <a href="http://www.blogger.com/">Bloger</a> to  <a href="http://pages.github.com/">Github Pages</a>.</p>
-
-<p>I am using <a href="http://octopress.org/">Octopress</a> with the <a href="http://kaworu.github.io/octopress/">Octostrap3</a> theme.  I imported the old blogger site with <a href="http://import.jekyllrb.com/">jekyll-import</a>.</p>
-
-<p>Some of the formatting of the old site has been lost, and there seems to be no good way of bringing the comments over.  Expect my next post to be about how it all worked out.</p>
-
-<p>Note: The old site is still available <a href="http://mostlyblather.blogspot.com">here</a>.</p>
+<p>As an aside, I&#8217;m really enjoying using Markdown to author blog posts.  I&#8217;m using <a href="http://markdownpad.com/">MakrdownPad 2</a> on Windows and it is very slick.</p>
 </div>
   
   
@@ -444,11 +557,11 @@
   
   <div id="recent_posts" class="list-group">
     
+    <a class="list-group-item " href="/blog/2015/05/23/mermaid-jekyll-octopress/">Mermaid Octopress Integration</a>
+    
     <a class="list-group-item " href="/blog/2014/01/03/scala-password-hash/">Scala Password Hash</a>
     
     <a class="list-group-item " href="/blog/2014/01/03/blog-migration-recap/">Blog Migration Recap</a>
-    
-    <a class="list-group-item " href="/blog/2013/12/31/blog-moving-to-github/">Blog Moving to Github</a>
     
   </div>
 </section>
@@ -474,6 +587,24 @@
     <a class="list-group-item " href="/blog/categories/security/index.html">
         <span class="badge">1</span>
         security
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/jekyll/index.html">
+        <span class="badge">1</span>
+        jekyll
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/octopress/index.html">
+        <span class="badge">1</span>
+        octopress
+      </a>
+    
+    
+    <a class="list-group-item " href="/blog/categories/mermaid/index.html">
+        <span class="badge">1</span>
+        mermaid
       </a>
     
   </div>
